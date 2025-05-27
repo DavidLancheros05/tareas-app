@@ -1,48 +1,19 @@
-const express = require('express');
-const cors = require('cors');
+const mongoose = require('mongoose');
 
-const app = express();
-const port = 3000;
+// Conexión a MongoDB (usa variables de entorno en Render)
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log("Conectado a MongoDB"))
+  .catch(err => console.error(err));
 
-app.use(cors()); // Permite peticiones desde el frontend
-app.use(express.json()); // Permite leer JSON
-
-let tareas = []; // En memoria (luego lo pasaremos a base de datos)
-
-// Obtener todas las tareas
-app.get('/tareas', (req, res) => {
-  res.json(tareas);
+// Modelo de Tarea
+const Tarea = mongoose.model('Tarea', {
+  texto: String,
+  completada: { type: Boolean, default: false }
 });
 
-// Agregar nueva tarea
-app.post('/tareas', (req, res) => {
-  const nuevaTarea = { texto: req.body.texto, completada: false };
-  tareas.push(nuevaTarea);
-  res.status(201).json(nuevaTarea);
-});
-
-// Cambiar estado de una tarea (completada/no completada)
-app.put('/tareas/:index', (req, res) => {
-  const index = req.params.index;
-  if (tareas[index]) {
-    tareas[index].completada = !tareas[index].completada;
-    res.json(tareas[index]);
-  } else {
-    res.status(404).json({ error: 'Tarea no encontrada' });
-  }
-});
-
-// Eliminar una tarea
-app.delete('/tareas/:index', (req, res) => {
-  const index = req.params.index;
-  if (tareas[index]) {
-    const eliminada = tareas.splice(index, 1);
-    res.json(eliminada[0]);
-  } else {
-    res.status(404).json({ error: 'Tarea no encontrada' });
-  }
-});
-
-app.listen(port, () => {
-  console.log(`Servidor backend corriendo en http://localhost:${port}`);
+// Ruta POST (ejemplo)
+app.post('/tareas', async (req, res) => {
+  const tarea = new Tarea({ texto: req.body.texto });
+  await tarea.save();
+  res.status(201).json(tarea);
 });
