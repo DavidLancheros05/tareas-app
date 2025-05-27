@@ -1,19 +1,34 @@
-const mongoose = require('mongoose');
+// 1. Importaciones
+const express = require('express');
+const cors = require('cors');
 
-// Conexión a MongoDB (usa variables de entorno en Render)
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("Conectado a MongoDB"))
-  .catch(err => console.error(err));
+// 2. Inicialización de Express
+const app = express();
+const port = process.env.PORT || 3000;
 
-// Modelo de Tarea
-const Tarea = mongoose.model('Tarea', {
-  texto: String,
-  completada: { type: Boolean, default: false }
+// 3. Middlewares
+app.use(cors());
+app.use(express.json());
+
+// 4. Datos en memoria (solución temporal)
+let tareas = [];
+
+// 5. Rutas
+app.get('/tareas', (req, res) => {
+  res.json(tareas);
 });
 
-// Ruta POST (ejemplo)
-app.post('/tareas', async (req, res) => {
-  const tarea = new Tarea({ texto: req.body.texto });
-  await tarea.save();
-  res.status(201).json(tarea);
+app.post('/tareas', (req, res) => {
+  const nuevaTarea = {
+    id: Date.now().toString(),
+    texto: req.body.texto,
+    completada: false
+  };
+  tareas.push(nuevaTarea);
+  res.status(201).json(nuevaTarea);
+});
+
+// 6. Iniciar servidor
+app.listen(port, () => {
+  console.log(`Servidor backend corriendo en http://localhost:${port}`);
 });
