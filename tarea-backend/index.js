@@ -1,4 +1,5 @@
 const express = require('express');
+
 const cors = require('cors');
 
 const app = express();
@@ -52,3 +53,9 @@ app._router.stack.forEach((layer) => {
 app.listen(port, () => {
   console.log(`Servidor backend corriendo en http://localhost:${port}`);
 });
+
+
+app.use(cors({
+  origin: ['https://tu-frontend.vercel.app', 'http://localhost:3000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
