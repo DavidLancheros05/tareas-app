@@ -1,19 +1,14 @@
-// 1. Importaciones
 const express = require('express');
 const cors = require('cors');
 
-// 2. Inicialización de Express
 const app = express();
 const port = process.env.PORT || 3000;
 
-// 3. Middlewares
 app.use(cors());
 app.use(express.json());
 
-// 4. Datos en memoria (solución temporal)
 let tareas = [];
 
-// 5. Rutas
 app.get('/tareas', (req, res) => {
   res.json(tareas);
 });
@@ -28,7 +23,13 @@ app.post('/tareas', (req, res) => {
   res.status(201).json(nuevaTarea);
 });
 
-// 6. Iniciar servidor
+// Ruta DELETE agregada
+app.delete('/tareas/:id', (req, res) => {
+  const id = req.params.id;
+  tareas = tareas.filter(tarea => tarea.id !== id);
+  res.status(200).json({ message: "Tarea eliminada" });
+});
+
 app.listen(port, () => {
   console.log(`Servidor backend corriendo en http://localhost:${port}`);
 });
