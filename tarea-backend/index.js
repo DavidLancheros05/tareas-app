@@ -24,20 +24,18 @@ app.post('/tareas', (req, res) => {
 });
 
 // Ruta DELETE agregada
+// Ruta DELETE corregida (usa == en lugar de !== para comparación flexible)
 app.delete('/tareas/:id', (req, res) => {
   const id = req.params.id;
-  console.log(`Intentando eliminar ID: ${id}`); // Debug
+  console.log(`Eliminando ID: ${id} (Tipo: ${typeof id})`); // Debug
   
-  const initialLength = tareas.length;
-  tareas = tareas.filter(tarea => {
-    console.log(`Comparando: ${tarea.id} (${typeof tarea.id}) vs ${id} (${typeof id})`); // Debug
-    return tarea.id !== id;
-  });
-
-  if (tareas.length < initialLength) {
-    res.status(200).json({ success: true });
+  const tareaIndex = tareas.findIndex(t => t.id == id); // ¡Usa == en lugar de !==!
+  
+  if (tareaIndex !== -1) {
+    const [tareaEliminada] = tareas.splice(tareaIndex, 1);
+    res.json(tareaEliminada);
   } else {
-    res.status(404).json({ error: "ID no encontrado" });
+    res.status(404).json({ error: "ID no encontrado. IDs disponibles: " + tareas.map(t => t.id).join(", ") });
   }
 });
 
